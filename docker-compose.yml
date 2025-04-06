@@ -1,0 +1,44 @@
+services:
+  api:
+    container_name: mpit.server
+    image: mpit
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      #- ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      #- ASPNETCORE_HTTPS_PORTS=8081
+    build:
+      context: .
+      dockerfile: ./mpit/Dockerfile
+    volumes:
+      - ./ssl:/app/ssl
+      - ./:/source # delete on prod
+    networks:
+      - mpit
+    depends_on:
+      - db
+
+  db:
+    container_name: mpit.db
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: mpit
+      POSTGRES_USER: mpit
+      POSTGRES_PASSWORD: mpit
+    networks:
+      - mpit
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+networks:
+  mpit:
+    driver: bridge
+
+volumes:
+  postgres-data:

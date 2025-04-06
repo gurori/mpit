@@ -1,0 +1,79 @@
+# Общие игнорирования
+######################
+*.suo
+*.sln
+*.user
+*.userosscache
+*.csproj.vspscc
+*.vssscc
+[Pp]ublish/*
+_ReSharper*/
+[Bb]in/
+[Oo]bj/
+*.log
+*.tmp
+*.swp
+*.DS_Store
+.vs/
+.vscode/
+
+# NuGet пакеты
+######################
+packages/
+*.nupkg
+*.snupkg
+!**/packages.config
+
+# ASP.NET Core специфичные
+######################
+/wwwroot/temp
+/wwwroot/bundles
+/bower_components/
+/node_modules/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Секреты и настройки (особенно важно!)
+######################
+appsettings.Development.json
+secrets.json
+*.config
+*.xml
+
+# DotNet CLI Tools
+######################
+.dotnet/
+
+# Azure
+######################
+/ServiceConfiguration.*.cscfg
+/PkgTmp/
+/.vs/ProjectSettings.json
+/Properties/PublishProfiles/*.*.pubxml.user
+/Properties/PublishProfiles/*.wpp.targets
+
+# Docker
+######################
+**/docker-compose*
+.dockerignore
+
+# Visual Studio files
+######################
+*.vs/
+*.vspscc
+*.vssscc
+*.vspref
+*.dotsettings.user
+*.cachefile
+*.resharper.user
+
+# Другие файлы, которые не должны попасть в репозиторий
+######################
+/TestResults/
+/Debug/
+/Release/
+/App_Data/
+/Backup/
+
+.config/
