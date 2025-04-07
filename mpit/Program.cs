@@ -8,6 +8,7 @@ using mpit.mpit.Application.Services;
 using mpit.mpit.DataAccess.DbContexts;
 using mpit.mpit.DataAccess.Repositories;
 using mpit.mpit.Infastructure.Auth;
+using mpit.mpit.Infastructure.Chat.Hubs;
 using mpit.mpit.Infastructure.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -43,6 +44,7 @@ services.AddScoped<IPermissionService, PermissionService>();
 
 services.AddScoped<IJwtProvider, JwtProvider>();
 services.AddScoped<IPasswordHasher, PasswordHasher>();
+services.AddSignalR();
 
 services.AddAutoMapper(typeof(AppAutoMapperProfile));
 
@@ -83,5 +85,7 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapHub<ChatHub>("/chat");
 
 app.Run();
