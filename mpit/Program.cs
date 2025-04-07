@@ -17,6 +17,11 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 var environment = builder.Environment;
 
+services.AddStackExchangeRedisCache(o =>
+{
+    o.Configuration = configuration.GetConnectionString("Redis");
+});
+
 services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
 services.Configure<AuthorizationOptions>(configuration.GetSection(nameof(AuthorizationOptions)));
 
