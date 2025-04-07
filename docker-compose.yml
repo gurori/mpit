@@ -1,4 +1,10 @@
 services:
+  cache:
+    container_name: mpit.redis
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
   api:
     container_name: mpit.server
     image: mpit
@@ -20,6 +26,7 @@ services:
       - mpit
     depends_on:
       - db
+      - cache
 
   db:
     container_name: mpit.db
