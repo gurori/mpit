@@ -1,5 +1,14 @@
 using Microsoft.EntityFrameworkCore;
+using mpit.DataAccess;
+using mpit.Extensions;
+using mpit.mpit.Application.Interfaces.Auth;
+using mpit.mpit.Application.Interfaces.Repositories;
+using mpit.mpit.Application.Interfaces.Services;
+using mpit.mpit.Application.Services;
 using mpit.mpit.DataAccess.DbContexts;
+using mpit.mpit.DataAccess.Repositories;
+using mpit.mpit.Infastructure.Auth;
+using mpit.mpit.Infastructure.Mapping;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +16,8 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 var environment = builder.Environment;
 
-// There will be Confugures
+services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
+services.Configure<AuthorizationOptions>(configuration.GetSection(nameof(AuthorizationOptions)));
 
 services.AddSwaggerGen();
 
@@ -25,6 +35,18 @@ services.AddCors(option =>
 services.AddMvc();
 
 // Add services to the container.
+services.AddScoped<IUsersRepository, UsersRepository>();
+services.AddScoped<IRoleRepository, RoleRepository>();
+
+services.AddScoped<IUsersService, UsersService>();
+services.AddScoped<IPermissionService, PermissionService>();
+
+services.AddScoped<IJwtProvider, JwtProvider>();
+services.AddScoped<IPasswordHasher, PasswordHasher>();
+
+services.AddAutoMapper(typeof(AppAutoMapperProfile));
+
+services.AddAuthentication(configuration);
 
 services.AddControllers();
 

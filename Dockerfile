@@ -10,7 +10,7 @@ RUN dotnet restore
 # copy everything else and build app
 COPY mpit/. ./mpit/
 WORKDIR /source/mpit
-RUN dotnet publish -c release -o /app --no-restore
+RUN dotnet publish -c release -o /app 
 
 # final stage/image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0

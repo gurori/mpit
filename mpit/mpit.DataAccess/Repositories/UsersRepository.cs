@@ -1,30 +1,44 @@
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using mpit.mpit.Application.Interfaces.Repositories;
+using mpit.mpit.Core.DTOs.User;
 using mpit.mpit.DataAccess.DbContexts;
 using mpit.mpit.DataAccess.Entities;
 
 namespace mpit.mpit.DataAccess.Repositories;
 
-public sealed class UsersRepository(ApplicationDbContext dbContext) : IUsersRepository
+public sealed class UsersRepository(ApplicationDbContext dbContext, IMapper mapper)
+    : IUsersRepository
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
+    private readonly IMapper _mapper = mapper;
 
     public Task DeleteAsync(Guid id)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IList<UserEntity>> GetAllAsync()
+    public Task<IList<User>> GetAllAsync()
     {
         throw new NotImplementedException();
     }
 
-    public Task<UserEntity?> GetByIdAsync(Guid id)
+    public Task<User?> GetByIdAsync(Guid id)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IList<UserEntity>> GetManyByIdsAsync(IList<Guid> ids)
+    public async Task<UserEntity?> GetEntityByLoginAsync(string login)
+    {
+        var userEntity = await _dbContext
+            .Users.AsNoTracking()
+            .Where(u => u.Login == login)
+            .FirstOrDefaultAsync();
+
+        return userEntity;
+    }
+
+    public Task<IList<User>> GetManyByIdsAsync(IList<Guid> ids)
     {
         throw new NotImplementedException();
     }

@@ -12,7 +12,7 @@ services:
       #- ASPNETCORE_HTTPS_PORTS=8081
     build:
       context: .
-      dockerfile: ./mpit/Dockerfile
+      dockerfile: ./Dockerfile
     volumes:
       - ./ssl:/app/ssl
       - ./:/source # delete on prod
@@ -26,7 +26,7 @@ services:
     image: postgres:latest
     restart: always
     ports:
-      - "5432:5432"
+      - "5433:5432"
     environment:
       POSTGRES_DB: mpit
       POSTGRES_USER: mpit
