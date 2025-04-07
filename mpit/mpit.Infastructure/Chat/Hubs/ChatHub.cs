@@ -33,21 +33,41 @@ public class ChatHub(IDistributedCache cache) : Hub<IChatMethods>
                 await Clients
                     .Group(connection.ChatId)
                     .ReceiveMessageAsync(connection.UserName, message);
+                await AddMessageToDbAsync(connection.UserName, message);
             }
         }
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var stringConnection = await _cache.GetAsync(Context.ConnectionId);
-        var connection = JsonSerializer.Deserialize<UserChatConnection>(stringConnection);
-
-        if (connection is not null)
+        var stringConnection = await _cache.GetStringAsync(Context.ConnectionId);
+        if (stringConnection is not null)
         {
-            await _cache.RemoveAsync(Context.ConnectionId);
-            await Groups.RemoveFromGroupAsync(Context.ConnectionId, connection.ChatId);
+            var connection = JsonSerializer.Deserialize<UserChatConnection>(stringConnection);
+
+            if (connection is not null)
+            {
+                await _cache.RemoveAsync(Context.ConnectionId);
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, connection.ChatId);
+            }
         }
 
         await base.OnDisconnectedAsync(exception);
+    }
+
+    private async Task AddMessageToDbAsync(string userName, string message)
+    {
+        ChatMessage chatMessage = new(userName, message);
+        string key = $"messages-{userName}";
+
+        var stringChatMessages = await _cache.GetStringAsync(key) ?? "[]";
+        var chatMessages = JsonSerializer.Deserialize<ChatMessage[]>(stringChatMessages) ?? [];
+
+        var newChatMessages = chatMessages.ToList();
+        newChatMessages.Add(chatMessage);
+
+        string stringMessages = JsonSerializer.Serialize(newChatMessages);
+        await _cache.SetStringAsync(key, stringMessages);
+        System.Console.WriteLine(stringMessages);
     }
 }
