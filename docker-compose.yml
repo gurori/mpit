@@ -5,6 +5,8 @@ services:
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      - mpit
   api:
     container_name: mpit.server
     image: mpit
