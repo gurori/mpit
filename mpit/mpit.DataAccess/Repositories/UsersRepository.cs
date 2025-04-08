@@ -38,6 +38,15 @@ public sealed class UsersRepository(ApplicationDbContext dbContext, IMapper mapp
         return userEntity;
     }
 
+    public async Task<string> GetLoginByIdAsync(Guid id)
+    {
+        return await _dbContext
+            .Users.AsNoTracking()
+            .Where(u => u.Id == id)
+            .Select(u => u.Login)
+            .FirstAsync();
+    }
+
     public Task<IList<User>> GetManyByIdsAsync(IList<Guid> ids)
     {
         throw new NotImplementedException();

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using mpit.DataAccess;
 using mpit.Extensions;
 using mpit.mpit.Application.Interfaces.Auth;
+using mpit.mpit.Application.Interfaces.Chats;
 using mpit.mpit.Application.Interfaces.Repositories;
 using mpit.mpit.Application.Interfaces.Services;
 using mpit.mpit.Application.Services;
@@ -17,13 +18,13 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 var environment = builder.Environment;
 
+services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
+services.Configure<AuthorizationOptions>(configuration.GetSection(nameof(AuthorizationOptions)));
+
 services.AddStackExchangeRedisCache(o =>
 {
     o.Configuration = configuration.GetConnectionString("Redis");
 });
-
-services.Configure<JwtOptions>(configuration.GetSection(nameof(JwtOptions)));
-services.Configure<AuthorizationOptions>(configuration.GetSection(nameof(AuthorizationOptions)));
 
 services.AddSwaggerGen();
 
@@ -46,6 +47,7 @@ services.AddScoped<IRoleRepository, RoleRepository>();
 
 services.AddScoped<IUsersService, UsersService>();
 services.AddScoped<IPermissionService, PermissionService>();
+services.AddScoped<IChatsService, ChatsService>();
 
 services.AddScoped<IJwtProvider, JwtProvider>();
 services.AddScoped<IPasswordHasher, PasswordHasher>();

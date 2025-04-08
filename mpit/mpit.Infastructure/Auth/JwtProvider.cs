@@ -4,7 +4,7 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using mpit.mpit.Application.Interfaces.Auth;
-using mpit.mpit.Infastructure.Auth;
+using mpit.mpit.Core.Exceptions;
 
 namespace mpit.mpit.Infastructure.Auth
 {
@@ -38,6 +38,20 @@ namespace mpit.mpit.Infastructure.Auth
             );
 
             return _tokenHandler.WriteToken(token);
+        }
+
+        public async Task<Guid> GetUserIdAsync(string token)
+        {
+            TokenValidationResult validationResult = await ValidateTokenAsync(token);
+
+            if (!validationResult.IsValid)
+                throw new UnauthorizedException();
+
+            string id =
+                validationResult.Claims[CustomClaims.UserId].ToString()
+                ?? throw new UnauthorizedException();
+
+            return Guid.Parse(id);
         }
 
         public ClaimsPrincipal ValidateToken(string token)

@@ -8,4 +8,5 @@ public interface IJwtProvider
     public Task<string> GenerateTokenAsync(Guid userId, string role);
     public ClaimsPrincipal ValidateToken(string token);
     public Task<TokenValidationResult> ValidateTokenAsync(string token);
+    public Task<Guid> GetUserIdAsync(string token);
 }

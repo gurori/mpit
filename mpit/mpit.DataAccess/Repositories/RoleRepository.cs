@@ -11,9 +11,8 @@ namespace mpit.mpit.DataAccess.Repositories
         public async Task<HashSet<string>> GetPermissionsAsync(string roleName)
         {
             var permissions = await _context
-                .Roles.AsNoTracking()
-                .Include(r => r.Permissions)
-                .Where(r => r.Name.ToLower() == roleName)
+                .Roles.Include(r => r.Permissions)
+                .Where(r => r.Name.ToLower() == roleName.ToLower())
                 .Select(r => r.Permissions)
                 .ToArrayAsync();
 
