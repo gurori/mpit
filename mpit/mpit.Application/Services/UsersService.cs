@@ -19,11 +19,22 @@ public sealed class UsersService(
     private readonly IMapper _mapper = mapper;
     private readonly IJwtProvider _jwtProvider = jwtProvider;
 
+    public async Task AddInfoAsync(string token, InfoRequest infoRequest)
+    {
+        Guid userId = await _jwtProvider.GetUserIdAsync(token);
+        await _repository.AddInfoAsync(
+            userId,
+            infoRequest.Name,
+            infoRequest.Date,
+            infoRequest.Need
+        );
+    }
+
     public async Task<string> LoginAsync(string login, string password)
     {
         var userEntity =
             await _repository.GetEntityByLoginAsync(login)
-            ?? throw new NotFoundException("Пользователь с данной почтой не зарегистрирован");
+            ?? throw new NotFoundException("Пользователь с данным логином не зарегистрирован");
 
         if (!_passwordHasher.Verify(password, userEntity.PasswordHash))
             throw new ConflictException("Неверный пароль");

@@ -8,4 +8,6 @@ public interface IUsersRepository : IRepository<User>
     public Task<bool> TryCreateAsync(string login, string passwordHash, string role);
     public Task<UserEntity?> GetEntityByLoginAsync(string login);
     public Task<string> GetLoginByIdAsync(Guid id);
+    public Task AddInfoAsync(Guid userId, string name, string date, string need);
+    public Task<UserEntity[]> GetInfosByLogins(string[] logins);
 }

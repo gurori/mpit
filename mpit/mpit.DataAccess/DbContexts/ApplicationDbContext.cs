@@ -13,6 +13,9 @@ public class ApplicationDbContext(
 {
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<RoleEntity> Roles { get; set; }
+    public DbSet<InfoEntity> Infos { get; set; }
+
+    //public DbSet<HelpEntity> Helps { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,6 +24,13 @@ public class ApplicationDbContext(
         //modelBuilder.ApplyConfiguration(new RolePermissionConfiguration(authOptions.Value));
         modelBuilder.Entity<RolePermissionEntity>().HasKey(r => new { r.RoleId, r.PermissionId });
         modelBuilder.Entity<RolePermissionEntity>().HasData(ParseRolePermissions());
+
+        modelBuilder
+            .Entity<UserEntity>()
+            .HasOne(u => u.Info)
+            .WithOne(i => i.User)
+            .HasForeignKey<InfoEntity>(i => i.UserId);
+        base.OnModelCreating(modelBuilder);
     }
 
     private RolePermissionEntity[] ParseRolePermissions() =>

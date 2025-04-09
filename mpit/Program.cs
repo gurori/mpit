@@ -9,8 +9,11 @@ using mpit.mpit.Application.Services;
 using mpit.mpit.DataAccess.DbContexts;
 using mpit.mpit.DataAccess.Repositories;
 using mpit.mpit.Infastructure.Auth;
+using mpit.mpit.Infastructure.Cache;
+using mpit.mpit.Infastructure.Chat;
 using mpit.mpit.Infastructure.Chat.Hubs;
 using mpit.mpit.Infastructure.Mapping;
+using mpit.mpit.Infastructure.Telegram;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -48,10 +51,13 @@ services.AddScoped<IRoleRepository, RoleRepository>();
 services.AddScoped<IUsersService, UsersService>();
 services.AddScoped<IPermissionService, PermissionService>();
 services.AddScoped<IChatsService, ChatsService>();
+services.AddSingleton<CacheClient>();
+services.AddSingleton<ChatsClient>();
 
 services.AddScoped<IJwtProvider, JwtProvider>();
 services.AddScoped<IPasswordHasher, PasswordHasher>();
 services.AddSignalR();
+services.AddSingleton<BotService>();
 
 services.AddAutoMapper(typeof(AppAutoMapperProfile));
 
@@ -94,5 +100,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapHub<ChatHub>("/chat");
+
+var bot = app.Services.GetRequiredService<BotService>();
+await bot.StartAsync(CancellationToken.None);
 
 app.Run();

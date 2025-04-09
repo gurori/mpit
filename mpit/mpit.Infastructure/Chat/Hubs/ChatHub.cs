@@ -10,9 +10,10 @@ public interface IChatMethods
     public Task ReceiveMessageAsync(string UserName, string message);
 }
 
-public class ChatHub(IDistributedCache cache) : Hub<IChatMethods>
+public class ChatHub(IDistributedCache cache, ChatsClient chatsService) : Hub<IChatMethods>
 {
     private readonly IDistributedCache _cache = cache;
+    private readonly ChatsClient _chatsService = chatsService;
 
     public async Task JoinChatAsync(UserChatConnection connection)
     {
@@ -20,6 +21,11 @@ public class ChatHub(IDistributedCache cache) : Hub<IChatMethods>
 
         string stringConnection = JsonSerializer.Serialize(connection);
         await _cache.SetStringAsync(Context.ConnectionId, stringConnection);
+        var loginsString = await _cache.GetStringAsync("logins") ?? "[]";
+        var logins = (JsonSerializer.Deserialize<string[]>(loginsString) ?? []).ToHashSet();
+        logins.Add(connection.UserName);
+        loginsString = JsonSerializer.Serialize(logins);
+        await _cache.SetStringAsync("logins", loginsString);
     }
 
     public async Task SendMessageAsync(string message)
@@ -33,7 +39,7 @@ public class ChatHub(IDistributedCache cache) : Hub<IChatMethods>
                 await Clients
                     .Group(connection.ChatId)
                     .ReceiveMessageAsync(connection.UserName, message);
-                await AddMessageToDbAsync(connection.UserName, message);
+                await _chatsService.AddMessageToDbAsync(connection.UserName, message);
             }
         }
     }
@@ -53,21 +59,5 @@ public class ChatHub(IDistributedCache cache) : Hub<IChatMethods>
         }
 
         await base.OnDisconnectedAsync(exception);
-    }
-
-    private async Task AddMessageToDbAsync(string userName, string message)
-    {
-        ChatMessage chatMessage = new(userName, message);
-        string key = $"messages-{userName}";
-
-        var stringChatMessages = await _cache.GetStringAsync(key) ?? "[]";
-        var chatMessages = JsonSerializer.Deserialize<ChatMessage[]>(stringChatMessages) ?? [];
-
-        var newChatMessages = chatMessages.ToList();
-        newChatMessages.Add(chatMessage);
-
-        string stringMessages = JsonSerializer.Serialize(newChatMessages);
-        await _cache.SetStringAsync(key, stringMessages);
-        System.Console.WriteLine(stringMessages);
     }
 }

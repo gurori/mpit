@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using mpit.mpit.Application.Interfaces.Services;
 using mpit.mpit.Core.DTOs.User;
@@ -24,5 +25,15 @@ public sealed class UsersController(IUsersService usersService) : BaseController
         {
             string token = await _usersService.LoginAsync(request.Login, request.Password);
             return Ok(token);
+        });
+
+    [HttpPost("info")]
+    [Authorize]
+    public async Task<IActionResult> AddInfo(InfoRequest request) =>
+        await TryCatchAsync(async () =>
+        {
+            string token = GetTokenFromHeaders();
+            await _usersService.AddInfoAsync(token, request);
+            return Ok();
         });
 }

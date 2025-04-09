@@ -13,6 +13,25 @@ public sealed class UsersRepository(ApplicationDbContext dbContext, IMapper mapp
     private readonly ApplicationDbContext _dbContext = dbContext;
     private readonly IMapper _mapper = mapper;
 
+    public async Task AddInfoAsync(Guid userId, string name, string date, string need)
+    {
+        System.Console.WriteLine(userId);
+        var user = await _dbContext.Users.Where(x => x.Id == userId).FirstOrDefaultAsync();
+        System.Console.WriteLine(user?.Login);
+        var infoEntity = new InfoEntity
+        {
+            Name = name,
+            Date = date,
+            Need = need,
+            UserId = userId,
+            User = user!,
+        };
+        user!.Info = infoEntity;
+        await _dbContext.Infos.AddAsync(infoEntity);
+        _dbContext.Users.Update(user);
+        await _dbContext.SaveChangesAsync();
+    }
+
     public Task DeleteAsync(Guid id)
     {
         throw new NotImplementedException();
@@ -36,6 +55,18 @@ public sealed class UsersRepository(ApplicationDbContext dbContext, IMapper mapp
             .FirstOrDefaultAsync();
 
         return userEntity;
+    }
+
+    public async Task<UserEntity[]> GetInfosByLogins(string[] logins)
+    {
+        var users = await _dbContext
+            .Users.AsNoTracking()
+            .Include(u => u.Info)
+            .Where(u => logins.Contains(u.Login))
+            .ToArrayAsync();
+
+        //return users.Select(u => u.Info!).ToArray();
+        return users;
     }
 
     public async Task<string> GetLoginByIdAsync(Guid id)
